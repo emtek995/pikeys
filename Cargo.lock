@@ -365,6 +365,7 @@ dependencies = [
  "cortex-m-rtic",
  "embedded-hal",
  "fugit",
+ "generic-array 0.14.6",
  "keyberon",
  "panic-halt",
  "rp-pico",

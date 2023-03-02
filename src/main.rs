@@ -1,12 +1,10 @@
 #![no_std]
 #![no_main]
 
-mod keyboard;
-
 use panic_halt as _;
 use rtic::app;
 
-#[app(device = rp_pico::hal::pac, peripherals = true)]
+#[app(device = rp_pico::hal::pac, peripherals = true, dispatchers = [DMA_IRQ_0])]
 mod pikeys {
     use rp2040_monotonic::Rp2040Monotonic;
     use rp_pico::*;
@@ -22,9 +20,7 @@ mod pikeys {
     type Mono = Rp2040Monotonic;
 
     #[shared]
-    struct Shared {
-        usb_device: UsbDevice<'static, hal::usb::UsbBus>,
-    }
+    struct Shared {}
 
     #[local]
     struct Local {}
@@ -70,17 +66,13 @@ mod pikeys {
             USB_BUS.as_ref().unwrap()
         };
 
-        let usb_device = UsbDeviceBuilder::new(usb_bus, UsbVidPid(VID, PID))
+        let _usb_device = UsbDeviceBuilder::new(usb_bus, UsbVidPid(VID, PID))
             .manufacturer("derp")
             .product("Derpboard")
             .serial_number(core::env!("CARGO_PKG_VERSION"))
             .build();
 
-        (
-            Shared { usb_device },
-            Local {},
-            init::Monotonics(timer_mono),
-        )
+        (Shared {}, Local {}, init::Monotonics(timer_mono))
     }
 
     #[idle]
@@ -88,13 +80,5 @@ mod pikeys {
         loop {
             cortex_m::asm::wfi();
         }
-    }
-
-    #[task(binds = USBCTRL_IRQ, priority = 2, shared = [usb_device])]
-    fn usbctrl(c: usbctrl::Context) {
-        let mut usb_device = c.shared.usb_device;
-        usb_device.lock(|usb_device| {
-            usb_device.poll(&mut []);
-        });
     }
 }
