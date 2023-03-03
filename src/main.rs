@@ -6,7 +6,6 @@ use rtic::app;
 
 #[app(device = rp_pico::hal::pac, peripherals = true, dispatchers = [DMA_IRQ_0])]
 mod pikeys {
-    use rp2040_monotonic::Rp2040Monotonic;
     use rp_pico::*;
     use usb_device::{class_prelude::*, prelude::*};
 
@@ -15,9 +14,6 @@ mod pikeys {
     // "free" codes for testing
     const VID: u16 = 0xFC32;
     const PID: u16 = 0x1287;
-
-    #[monotonic(binds = TIMER_IRQ_0, default = true)]
-    type Mono = Rp2040Monotonic;
 
     #[shared]
     struct Shared {}
@@ -40,8 +36,6 @@ mod pikeys {
         )
         .ok()
         .unwrap();
-
-        let timer_mono = Rp2040Monotonic::new(c.device.TIMER);
 
         let sio = hal::Sio::new(c.device.SIO);
 
@@ -72,7 +66,7 @@ mod pikeys {
             .serial_number(core::env!("CARGO_PKG_VERSION"))
             .build();
 
-        (Shared {}, Local {}, init::Monotonics(timer_mono))
+        (Shared {}, Local {}, init::Monotonics())
     }
 
     #[idle]
