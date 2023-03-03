@@ -15,7 +15,7 @@ cortex-m = "0.7.7"
 cortex-m-rt = { version = "0.7.3", features = ["device"] }
 cortex-m-rtic = "1.1.4"
 embedded-hal = "0.2.7"
-embedded-time = "0.12.1"
+fugit = "0.3.6"
 keyberon = { git = "https://github.com/TeXitoi/keyberon.git", branch = "master" }
 panic-halt = "0.2.0"
 rp-pico = "0.7.0"
